@@ -11,6 +11,7 @@ import (
 	"net/http"
 )
 
+//爬去网页 并转码为utf-8
 func main() {
 	resp, err := http.Get(
 		"http://www.zhenai.com/zhenghun")
@@ -37,7 +38,7 @@ func main() {
 }
 
 func determineEncoding(r io.Reader) encoding.Encoding {
-	bytes, err :=bufio.NewReader(r).Peek(1024)
+	bytes, err := bufio.NewReader(r).Peek(1024)
 	if err != nil {
 		panic(err)
 	}
