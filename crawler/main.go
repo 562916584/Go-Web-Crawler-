@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 )
 
 //爬去网页 并转码为utf-8
@@ -34,7 +35,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s\n", all)
+	//fmt.Printf("%s\n", all)
+	printCityList(all)
 }
 
 func determineEncoding(r io.Reader) encoding.Encoding {
@@ -44,4 +46,16 @@ func determineEncoding(r io.Reader) encoding.Encoding {
 	}
 	e, _, _ := charset.DetermineEncoding(bytes, "")
 	return e
+}
+
+func printCityList(reader []byte) {
+	//<a href="http://www.zhenai.com/zhenghun/dadukou" data-v-0c63b635="">大渡口</a>
+	re, err := regexp.Compile(`<a href="http://www.zhenai.com/zhenghun/[0-9a-z]+" [^>]*>[^<]+</a>`)
+	if err != nil {
+		panic(err)
+	}
+	matches := re.FindAll(reader, -1)
+	for _, v := range matches {
+		fmt.Printf("%s", v)
+	}
 }
