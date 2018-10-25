@@ -18,7 +18,7 @@ func ParseCityList(contents []byte) engine.ParseResult {
 	matches := re.FindAllSubmatch(contents, -1)
 	result := engine.ParseResult{}
 	// 爬去前10个城市  不然 太慢了
-	limit := 10
+	//limit := 10
 	for _, v := range matches {
 		result.Items = append(result.Items, "City"+string(v[2]))
 		result.Requests = append(result.Requests, engine.Request{
@@ -26,10 +26,11 @@ func ParseCityList(contents []byte) engine.ParseResult {
 			ParseFunc: ParseCity,
 		})
 		//fmt.Printf("城市: %s  url: %s  \n",v[2],v[1])
-		limit--
-		if limit == 0 {
-			break
-		}
+		// 单线程版本需要限制城市数目
+		//limit--
+		//if limit == 0 {
+		//	break
+		//}
 	}
 	return result
 }
