@@ -22,7 +22,7 @@ var House = regexp.MustCompile(`<td><span class="label">住房条件：</span><s
 var Car = regexp.MustCompile(`<td><span class="label">是否购车：</span><span field="">([^<]+)</span></td>`)
 var Job = regexp.MustCompile(` <td><span class="label">职业：</span><span field="">([^<]+)</span></td>`)
 
-func ParseProfile(contents []byte, result engine.ParseResult) {
+func ParseProfile(contents []byte, name string) engine.ParseResult {
 	profile := model.Profile{}
 	age, err := strconv.Atoi(extractString(contents, ageRe))
 	if err == nil {
@@ -37,7 +37,7 @@ func ParseProfile(contents []byte, result engine.ParseResult) {
 		profile.Weight = weight
 	}
 	profile.Marriage = extractString(contents, marriageRe)
-	profile.Name = extractString(contents, nameRe)
+	profile.Name = name
 	profile.Gender = extractString(contents, Gender)
 	profile.Income = extractString(contents, Incom)
 	profile.Education = extractString(contents, Education)
@@ -47,6 +47,10 @@ func ParseProfile(contents []byte, result engine.ParseResult) {
 	profile.House = extractString(contents, House)
 	profile.Car = extractString(contents, Car)
 	profile.Job = extractString(contents, Job)
+
+	result := engine.ParseResult{}
+	result.Items = append(result.Items, profile)
+	return result
 }
 
 func extractString(contents []byte, re *regexp.Regexp) string {

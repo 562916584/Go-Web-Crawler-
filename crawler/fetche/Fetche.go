@@ -13,9 +13,23 @@ import (
 )
 
 func Fetche(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+	//resp, err := http.Get(url)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//defer resp.Body.Close()
+	// 通过添加UA 伪装浏览器访问
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		log.Fatalln(err)
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 "+
+		"(KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
 	}
 	defer resp.Body.Close()
 
