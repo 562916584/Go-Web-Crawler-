@@ -9,7 +9,9 @@ type SimpleScheduler struct {
 func (s *SimpleScheduler) Submit(r engine.Request) {
 	// 送 request给 worker channel
 	// 启动concurrentEngine 开始工作
-	s.workerChan <- r
+	go func() {
+		s.workerChan <- r
+	}()
 }
 
 func (s *SimpleScheduler) ConfigureMusterWorkerChan(c chan engine.Request) {

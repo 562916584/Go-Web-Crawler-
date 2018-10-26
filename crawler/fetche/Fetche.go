@@ -10,7 +10,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
+
+var rateLimiter = time.Tick(10 * time.Millisecond)
 
 func Fetche(url string) ([]byte, error) {
 	//resp, err := http.Get(url)
@@ -18,6 +21,8 @@ func Fetche(url string) ([]byte, error) {
 	//	return nil, err
 	//}
 	//defer resp.Body.Close()
+	// 通过限制访问速度 防止封锁
+	<-rateLimiter
 	// 通过添加UA 伪装浏览器访问
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
