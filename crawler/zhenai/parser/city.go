@@ -2,19 +2,15 @@ package parser
 
 import (
 	"WebSpider/crawler/engine"
-	"log"
 	"regexp"
 )
 
-const cityRe = `<a href="(http://album.zhenai.com/u/[0-9]+)" [^>]*>([^<]+)</a>`
+var profileRe = regexp.MustCompile(`<a href="(http://album.zhenai.com/u/[0-9]+)" [^>]*>([^<]+)</a>`)
+var cityUrlRe = regexp.MustCompile(`<a href="(http://www.zhenai.com/zhenghun/shanghai/[^"]+)">下一页</a>`)
 
 // <a href="http://album.zhenai.com/u/1565829136" target="_blank">朗歌</a>
 func ParseCity(contents []byte) engine.ParseResult {
-	re, err := regexp.Compile(cityRe)
-	if err != nil {
-		log.Printf("ParseCityList failed : %s", err)
-	}
-	matches := re.FindAllSubmatch(contents, -1)
+	matches := profileRe.FindAllSubmatch(contents, -1)
 	result := engine.ParseResult{}
 	for _, v := range matches {
 		name := string(v[2])
@@ -26,6 +22,13 @@ func ParseCity(contents []byte) engine.ParseResult {
 			},
 		})
 		//fmt.Printf("城市: %s  url: %s  \n",v[2],v[1])
+	}
+	matches = cityUrlRe.FindAllSubmatch(contents, -1)
+	for _, m := range matches {
+		result.Requests = append(result.Requests, engine.Request{
+			Url:       string(m[1]),
+			ParseFunc: ParseCity,
+		})
 	}
 	return result
 }

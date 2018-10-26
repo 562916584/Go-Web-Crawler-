@@ -2,6 +2,7 @@ package main
 
 import (
 	"WebSpider/crawler/engine"
+	"WebSpider/crawler/persist"
 	"WebSpider/crawler/scheduler"
 	"WebSpider/crawler/zhenai/parser"
 )
@@ -10,11 +11,19 @@ import (
 func main() {
 
 	e := engine.ConcurrentEngine{
-		Scheduler:   &scheduler.SimpleScheduler{},
+		Scheduler:   &scheduler.QueuedScheduler{},
 		WorkerCount: 100,
+		ItemChan:    persist.ItemSaver(),
 	}
+	// 并发爬虫入口
+	//e.Run(engine.Request{
+	//	Url:       "http://www.zhenai.com/zhenghun",
+	//	ParseFunc: parser.ParseCityList,
+	//})
+
+	//上海城市测试
 	e.Run(engine.Request{
-		Url:       "http://www.zhenai.com/zhenghun",
-		ParseFunc: parser.ParseCityList,
+		Url:       "http://www.zhenai.com/zhenghun/shanghai",
+		ParseFunc: parser.ParseCity,
 	})
 }
