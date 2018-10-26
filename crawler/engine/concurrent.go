@@ -1,25 +1,36 @@
 package engine
 
-import "log"
+import (
+	"log"
+)
 
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
 }
 type Scheduler interface {
+	ReadyNotifier
 	Submit(Request)
+	WorkerChan() chan Request
 	ConfigureMusterWorkerChan(chan Request)
+	Run()
+}
+
+type ReadyNotifier interface {
+	WorkerReady(chan Request)
 }
 
 func (e *ConcurrentEngine) Run(seeds ...Request) {
 	// 准备工作
-	in := make(chan Request)
+	//in := make(chan Request)
 	out := make(chan ParseResult)
 	// 将in 这个channel与workerChannel关联
-	e.Scheduler.ConfigureMusterWorkerChan(in)
+	//e.Scheduler.ConfigureMusterWorkerChan(in)
+
+	e.Scheduler.Run()
 
 	for i := 0; i < e.WorkerCount; i++ {
-		createWorker(in, out)
+		createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
 	// 传入request
 	for _, r := range seeds {
@@ -39,9 +50,11 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 }
 
 // 开启线程 将request通过channel读取 然后调用worker函数解析
-func createWorker(in chan Request, out chan ParseResult) {
+func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 	go func() {
 		for {
+			// 告诉scheduler 我准备好了
+			ready.WorkerReady(in)
 			request := <-in
 			result, err := worker(request)
 			if err != nil {
