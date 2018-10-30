@@ -1,13 +1,21 @@
 package persist
 
 import (
+	"WebSpider/crawler/engine"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"gopkg.in/olivere/elastic.v5"
 	"log"
 )
 
-func ItemSaver() chan interface{} {
-	out := make(chan interface{})
+func ItemSaver(index string) (chan engine.Item, error) {
+	client, err := elastic.NewClient(
+		// 运行在docker上 是内网访问
+		elastic.SetSniff(false))
+	if err != nil {
+		return nil, err
+	}
+	out := make(chan engine.Item)
 	go func() {
 		itemCount := 1
 		for {
@@ -15,26 +23,33 @@ func ItemSaver() chan interface{} {
 			log.Printf("Saver item :#%d:  %v\n", itemCount, item)
 			itemCount++
 
-			save(item)
+			err := save(item, client, index)
+			if err != nil {
+				log.Printf("Item Saver : error"+
+					"saving item  %v: %v", item, err)
+			}
 		}
 	}()
-	return out
+	return out, nil
 }
 
-func save(item interface{}) (id string, err error) {
-	client, err := elastic.NewClient(
-		// 运行在docker上 是内网访问
-		elastic.SetSniff(false))
+func save(item engine.Item, client *elastic.Client, index string) (err error) {
 	if err != nil {
-		return "", err
+		return err
 	}
-	resp, err := client.Index().Index("dating_profile").
-		Type("zhenai").BodyJson(item).
-		Do(context.Background())
-	if err != nil {
-		return "", err
+	if item.Type == "" {
+		return errors.New("must supply type")
 	}
-
+	indexService := client.Index().Index(index).
+		Type(item.Type).
+		BodyJson(item)
+	if item.Id != "" {
+		indexService.Id(item.Id)
+	}
+	_, err1 := indexService.Do(context.Background())
+	if err1 != nil {
+		return err1
+	}
 	//fmt.Println("%+v", resp)
-	return resp.Id, nil
+	return nil
 }

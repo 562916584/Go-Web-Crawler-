@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"WebSpider/crawler/fetche"
 	"log"
 )
 
@@ -26,15 +25,4 @@ func (e SimpleEngine) Run(seeds ...Request) {
 			log.Printf("Got item %v", item)
 		}
 	}
-}
-
-// 并发worker 输入request 返回requests和Items
-func worker(r Request) (ParseResult, error) {
-	log.Printf("Fetching: %s", r.Url)
-	body, err := fetche.Fetche(r.Url)
-	if err != nil {
-		log.Printf("Fecher: error URL :%s err: %s", r.Url, err)
-		return ParseResult{}, err
-	}
-	return r.ParseFunc(body), nil
 }
