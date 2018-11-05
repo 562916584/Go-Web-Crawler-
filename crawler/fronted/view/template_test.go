@@ -1,17 +1,18 @@
-package fronted
+package view
 
 import (
 	"WebSpider/crawler/engine"
 	"WebSpider/crawler/fronted/model"
 	common "WebSpider/crawler/model"
-	"html/template"
 	"os"
 	"testing"
 )
 
 func TestTemplate(t *testing.T) {
-	template := template.Must(
-		template.ParseFiles("template.html"))
+	//template := template.Must(
+	//	template.ParseFiles("template.html"))
+	view := CreateSearchResultView("template.html")
+	// 打开或者创建文件
 	out, err := os.Create("template.test.html")
 	if err != nil {
 		panic(err)
@@ -43,7 +44,7 @@ func TestTemplate(t *testing.T) {
 	}
 	page.Start = 0
 	println(len(page.Items))
-	err1 := template.Execute(out, page)
+	err1 := view.Render(out, page)
 	if err1 != nil {
 		panic(err1)
 	}
