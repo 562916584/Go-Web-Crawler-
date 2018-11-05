@@ -38,9 +38,11 @@ func TestTemplate(t *testing.T) {
 			Car:        "未购车",
 		},
 	}
-	for i := 0; i < 0; i++ {
+	for i := 0; i < 10; i++ {
 		page.Items = append(page.Items, item)
 	}
+	page.Start = 0
+	println(len(page.Items))
 	err1 := template.Execute(out, page)
 	if err1 != nil {
 		panic(err1)
