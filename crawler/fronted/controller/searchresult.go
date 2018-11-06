@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// 连接搜索结果网页 和 elasticsearch服务
 type SearchResultHandler struct {
 	view   view.SearchResultView
 	client *elastic.Client
@@ -30,7 +31,7 @@ func CreateSearchResultHandler(template string) SearchResultHandler {
 	}
 }
 
-// 192.168.99.100:9200/search? q=男 已购房&from=20
+// localhost:8888/search? q=男 已购房&from=20
 // 需要查询和翻页
 func (h SearchResultHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	q := strings.TrimSpace(req.FormValue("q"))
