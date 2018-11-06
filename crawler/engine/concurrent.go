@@ -1,5 +1,7 @@
 package engine
 
+var visitedUrls = make(map[string]bool)
+
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
@@ -46,6 +48,9 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 			}
 		}
 		for _, request := range result.Requests {
+			if isDuplicate(request.Url) {
+				continue
+			}
 			e.Scheduler.Submit(request)
 		}
 	}
@@ -65,4 +70,13 @@ func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 			out <- result
 		}
 	}()
+}
+
+// 利用map 映射  去除重复的url
+func isDuplicate(url string) bool {
+	if visitedUrls[url] {
+		return true
+	}
+	visitedUrls[url] = true
+	return false
 }

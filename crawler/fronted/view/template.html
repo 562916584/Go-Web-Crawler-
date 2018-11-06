@@ -69,7 +69,11 @@
             {{end}}
             </tbody>
         </table>
-        {{/*<div align="middle">*/}}
+        <div align="middle">
+            {{if ge .PrevFrom 0}}
+                <a href="search?q={{.Query}}&from={{.PrevFrom}}">上一页</a>
+            {{end}}
+                <a href="search?q={{.Query}}&from={{.NextFrom}}">下一页</a>
         {{/*{{if gt .CurrentPage 1}}*/}}
             {{/*<a href="search?q={{.Query}}&current={{Sub .CurrentPage 1}}">上一页</a>*/}}
         {{/*{{end}}*/}}
@@ -77,7 +81,7 @@
             {{/*<a href="search?q={{.Query}}&current={{Add .CurrentPage 1}}">下一页</a>*/}}
         {{/*{{end}}*/}}
             {{/*<span>共{{.TotalPage}}页,当前第{{.CurrentPage}}页</span>*/}}
-        {{/*</div>*/}}
+        </div>
     </div>
 </div>
 </body>

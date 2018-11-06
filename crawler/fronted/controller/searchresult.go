@@ -8,6 +8,7 @@ import (
 	"gopkg.in/olivere/elastic.v5"
 	"net/http"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -44,16 +45,19 @@ func (h SearchResultHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 	if err1 != nil {
 		http.Error(w, err1.Error(), http.StatusBadRequest)
 	}
+	// 将结果写入模板html 并返回给客户端
 	err2 := h.view.Render(w, page)
 	if err2 != nil {
 		http.Error(w, err2.Error(), http.StatusBadRequest)
 	}
 }
 
+// 获取搜索结果
 func (h SearchResultHandler) getSearchResult(q string, from int) (model.SearchResult, error) {
 	var result model.SearchResult
+	result.Query = q
 	resp, err := h.client.Search("dating_profile").
-		Query(elastic.NewQueryStringQuery(q)).
+		Query(elastic.NewQueryStringQuery(rewriteQueryString(q))).
 		From(from).
 		Do(context.Background())
 	if err != nil {
@@ -61,7 +65,6 @@ func (h SearchResultHandler) getSearchResult(q string, from int) (model.SearchRe
 	}
 	result.Hits = resp.TotalHits()
 	result.Start = from
-
 	result.Items = resp.Each(reflect.TypeOf(engine.Item{}))
 	for _, v := range resp.Each(reflect.TypeOf(engine.Item{})) {
 		item, ok := v.(engine.Item)
@@ -69,5 +72,12 @@ func (h SearchResultHandler) getSearchResult(q string, from int) (model.SearchRe
 			result.Items = append(result.Items, item)
 		}
 	}
+	result.PrevFrom = result.Start - len(result.Items)
+	result.NextFrom = result.Start + len(result.Items)
 	return result, err
+}
+
+func rewriteQueryString(q string) string {
+	re := regexp.MustCompile(`([A-Z][a-z]*):`)
+	return re.ReplaceAllString(q, "Payload.$1:")
 }
