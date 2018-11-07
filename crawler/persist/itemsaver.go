@@ -23,7 +23,7 @@ func ItemSaver(index string) (chan engine.Item, error) {
 			log.Printf("Saver item :#%d:  %v\n", itemCount, item)
 			itemCount++
 
-			err := save(item, client, index)
+			err := Save(item, client, index)
 			if err != nil {
 				log.Printf("Item Saver : error"+
 					"saving item  %v: %v", item, err)
@@ -33,7 +33,7 @@ func ItemSaver(index string) (chan engine.Item, error) {
 	return out, nil
 }
 
-func save(item engine.Item, client *elastic.Client, index string) (err error) {
+func Save(item engine.Item, client *elastic.Client, index string) (err error) {
 	if err != nil {
 		return err
 	}
