@@ -3,13 +3,16 @@ package main
 import (
 	"WebSpider/crawler/engine"
 	"WebSpider/crawler/model"
+	"WebSpider/crawler_distributed/config"
 	"WebSpider/crawler_distributed/rpcsupport"
 	"testing"
+	"time"
 )
 
 func TestItemSaver(t *testing.T) {
 	// start ItemSaverServe
 	go serveRpc(":1234", "test1")
+	time.Sleep(3 * time.Second)
 	// start ItemSaverClient
 	client, err := rpcsupport.NewClient(":1234")
 	if err != nil {
@@ -37,5 +40,8 @@ func TestItemSaver(t *testing.T) {
 	}
 	// Call
 	result := ""
-	err := client.Call("ItemSaverService.Save", expected, result)
+	err1 := client.Call(config.ItemSaverRpc, expected, &result)
+	if err1 != nil {
+		t.Errorf("result: %s, error: %s ", result, err1)
+	}
 }
