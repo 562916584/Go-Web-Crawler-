@@ -12,7 +12,7 @@ import (
 func TestItemSaver(t *testing.T) {
 	// start ItemSaverServe
 	go serveRpc(":1234", "test1")
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 	// start ItemSaverClient
 	client, err := rpcsupport.NewClient(":1234")
 	if err != nil {

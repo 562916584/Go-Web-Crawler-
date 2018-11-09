@@ -3,6 +3,7 @@ package parser
 import (
 	"WebSpider/crawler/engine"
 	"WebSpider/crawler/model"
+	"WebSpider/crawler_distributed/config"
 	"regexp"
 	"strconv"
 )
@@ -92,7 +93,7 @@ func (p *ProfileParser) Parse(contents []byte, url string) engine.ParseResult {
 }
 
 func (p *ProfileParser) Serialize() (name string, args interface{}) {
-	return "ProfileParser", p.username
+	return config.ParseProfile, p.username
 }
 
 func NewProfileParser(username string) *ProfileParser {
