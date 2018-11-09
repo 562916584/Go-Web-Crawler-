@@ -22,8 +22,8 @@ func ParseCityList(contents []byte, _ string) engine.ParseResult {
 	for _, v := range matches {
 		//result.Items = append(result.Items, "City"+string(v[2]))
 		result.Requests = append(result.Requests, engine.Request{
-			Url:       string(v[1]),
-			ParseFunc: ParseCity,
+			Url:    string(v[1]),
+			Parser: engine.NewFuncParser(ParseCity, "ParseCity"),
 		})
 		//fmt.Printf("城市: %s  url: %s  \n",v[2],v[1])
 		// 单线程版本需要限制城市数目

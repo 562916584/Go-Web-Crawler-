@@ -10,7 +10,7 @@ import (
 
 // 起服务
 func main() {
-	err := serveRpc(fmt.Sprintf(":#%d", config.ItemSaverPort),
+	err := serveRpc(fmt.Sprintf(":%d", config.ItemSaverPort),
 		config.ElasticIndex)
 	if err != nil {
 		panic(err)

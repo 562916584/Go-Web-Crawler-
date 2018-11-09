@@ -26,7 +26,7 @@ var Job = regexp.MustCompile(` <td><span class="label">职业：</span><span fie
 var idUrlRe = regexp.MustCompile(`http://album.zhenai.com/u/[\d]+`)
 var guessRe = regexp.MustCompile(`<a class="exp-user-name"[^>]*href="(http://album.zhenai.com/u/[\d]+)">([^<]+)</a>`)
 
-func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
+func parseProfile(contents []byte, name string, url string) engine.ParseResult {
 	profile := model.Profile{}
 	age, err := strconv.Atoi(extractString(contents, ageRe))
 	if err == nil {
@@ -67,8 +67,8 @@ func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
 	for _, m := range matches {
 		result.Requests = append(result.Requests,
 			engine.Request{
-				Url:       string(m[1]),
-				ParseFunc: ProfileParser(string(m[2])),
+				Url:    string(m[1]),
+				Parser: NewProfileParser(string(m[2])),
 			})
 	}
 	return result
@@ -83,8 +83,20 @@ func extractString(contents []byte, re *regexp.Regexp) string {
 	}
 }
 
-func ProfileParser(name string) engine.ParserFunc {
-	return func(contents []byte, url string) engine.ParseResult {
-		return ParseProfile(contents, name, url)
+type ProfileParser struct {
+	username string
+}
+
+func (p *ProfileParser) Parse(contents []byte, url string) engine.ParseResult {
+	return parseProfile(contents, p.username, url)
+}
+
+func (p *ProfileParser) Serialize() (name string, args interface{}) {
+	return "ProfileParser", p.username
+}
+
+func NewProfileParser(username string) *ProfileParser {
+	return &ProfileParser{
+		username: username,
 	}
 }

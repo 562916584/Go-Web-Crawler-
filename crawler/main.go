@@ -20,8 +20,9 @@ func main() {
 	}
 	//并发爬虫入口
 	e.Run(engine.Request{
-		Url:       "http://www.zhenai.com/zhenghun",
-		ParseFunc: parser.ParseCityList,
+		Url: "http://www.zhenai.com/zhenghun",
+		Parser: engine.NewFuncParser(parser.ParseCityList,
+			"ParseCityList"),
 	})
 
 	//上海城市测试

@@ -11,7 +11,8 @@ import (
 
 //爬去网页 并转码为utf-8
 func main() {
-	itemChan, err := client.ItemSaver(fmt.Sprintf(":#%d", config.ItemSaverPort))
+	// 开启客户端 连接上服务
+	itemChan, err := client.ItemSaver(fmt.Sprintf(":%d", config.ItemSaverPort))
 	if err != nil {
 		panic(err)
 	}
