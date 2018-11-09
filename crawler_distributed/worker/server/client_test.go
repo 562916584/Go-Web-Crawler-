@@ -10,9 +10,9 @@ import (
 )
 
 func TestCrawlService(t *testing.T) {
-	const host = ":1234"
+	const host = ":9000"
 	go rpcsupport.ServeRpc(host, worker.CrawlService{})
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	client, err := rpcsupport.NewClient(host)
 	if err != nil {

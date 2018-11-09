@@ -29,7 +29,7 @@ func ServeRpc(host string, service interface{}) error {
 
 // 连接上 server
 func NewClient(host string) (*rpc.Client, error) {
-	conn, err := net.Dial("tcp", ":1234")
+	conn, err := net.Dial("tcp", host)
 	if err != nil {
 		return nil, err
 	}
