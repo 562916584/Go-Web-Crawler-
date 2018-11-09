@@ -8,7 +8,7 @@ import (
 	"gopkg.in/olivere/elastic.v5"
 )
 
-// 起服务
+// 起服务 存服务
 func main() {
 	err := serveRpc(fmt.Sprintf(":%d", config.ItemSaverPort),
 		config.ElasticIndex)

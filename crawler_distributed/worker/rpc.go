@@ -5,7 +5,7 @@ import "WebSpider/crawler/engine"
 type CrawlService struct {
 }
 
-func (CrawlService) Process(
+func (c CrawlService) Process(
 	req Request, result *ParseResult) error {
 	engineReq, err := DeserializeRequest(req)
 	if err != nil {

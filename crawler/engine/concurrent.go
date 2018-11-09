@@ -3,10 +3,15 @@ package engine
 var visitedUrls = make(map[string]bool)
 
 type ConcurrentEngine struct {
-	Scheduler   Scheduler
-	WorkerCount int
-	ItemChan    chan Item
+	Scheduler        Scheduler
+	WorkerCount      int
+	ItemChan         chan Item
+	RequestProcessor Processor
 }
+
+// 定义 worker函数
+type Processor func(r Request) (ParseResult, error)
+
 type Scheduler interface {
 	ReadyNotifier
 	Submit(Request)
@@ -29,7 +34,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	e.Scheduler.Run()
 
 	for i := 0; i < e.WorkerCount; i++ {
-		createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
+		e.createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
 	// 传入request
 	for _, r := range seeds {
@@ -57,13 +62,16 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 }
 
 // 开启线程 将request通过channel读取 然后调用worker函数
-func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
+// 从网上去抓取数据
+func (e *ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 	go func() {
 		for {
 			// 告诉scheduler 我准备好了
 			ready.WorkerReady(in)
 			request := <-in
-			result, err := Worker(request)
+			//result, err := Worker(request)
+			// 替换为分布式worker --rpc
+			result, err := e.RequestProcessor(request)
 			if err != nil {
 				continue
 			}
