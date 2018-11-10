@@ -19,6 +19,7 @@ func ItemSaver(index string) (chan engine.Item, error) {
 	go func() {
 		itemCount := 1
 		for {
+			// 等待数据从out中送出 然后存入Elastic search中
 			item := <-out
 			log.Printf("Saver item :#%d:  %v\n", itemCount, item)
 			itemCount++
@@ -40,6 +41,9 @@ func Save(item engine.Item, client *elastic.Client, index string) (err error) {
 	if item.Type == "" {
 		return errors.New("must supply type")
 	}
+	// index--数据库名字
+	// Type--表名
+	// ID--数据ID
 	indexService := client.Index().Index(index).
 		Type(item.Type).
 		BodyJson(item)

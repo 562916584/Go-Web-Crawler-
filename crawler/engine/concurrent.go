@@ -2,10 +2,14 @@ package engine
 
 var visitedUrls = make(map[string]bool)
 
+// 爬虫引擎
 type ConcurrentEngine struct {
-	Scheduler        Scheduler
-	WorkerCount      int
-	ItemChan         chan Item
+	Scheduler   Scheduler
+	WorkerCount int
+	// 存入Item数据的管道  在main函数配置
+	// 当这个channel 有值输入那么便会进入到 SvaeItem中的gorutine里存入Item
+	ItemChan chan Item
+	// 定义worker函数
 	RequestProcessor Processor
 }
 
@@ -62,6 +66,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 }
 
 // 开启线程 将request通过channel读取 然后调用worker函数
+// 传入两个参数 in--输入request的通道 out--输出Parseresult的通道
 // 从网上去抓取数据
 func (e *ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 	go func() {
