@@ -75,6 +75,7 @@ func parseProfile(contents []byte, name string, url string) engine.ParseResult {
 	return result
 }
 
+// 提取正则表达式 匹配结果
 func extractString(contents []byte, re *regexp.Regexp) string {
 	match := re.FindSubmatch(contents)
 	if len(match) >= 2 {
@@ -84,6 +85,7 @@ func extractString(contents []byte, re *regexp.Regexp) string {
 	}
 }
 
+// 解析人信息的结构体 同样实现了解析器接口
 type ProfileParser struct {
 	username string
 }

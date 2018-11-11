@@ -18,16 +18,19 @@ type SerializedParser struct {
 }
 
 // {'ParseCity',nil}  {'ParseCityList',nil} {'ProfileParser',Username}
+// 序列化后的Request
 type Request struct {
 	Url    string
 	Parser SerializedParser
 }
+
+// 序列化后的ParseResult
 type ParseResult struct {
 	Items    []engine.Item
 	Requests []Request
 }
 
-// 将request序列化
+// 将request序列化返回
 func SerialzeRequest(r engine.Request) Request {
 	name, args := r.Parser.Serialize()
 	return Request{
@@ -44,6 +47,7 @@ func SerialzeResult(r engine.ParseResult) ParseResult {
 	result := ParseResult{
 		Items: r.Items,
 	}
+	// 序列化requests
 	for _, req := range r.Requests {
 		result.Requests = append(result.Requests,
 			SerialzeRequest(req))
@@ -62,6 +66,9 @@ func DeserializeRequest(r Request) (engine.Request, error) {
 		Parser: parser,
 	}, nil
 }
+
+// 根据序列化后的request的SerializedParser中函数名字
+// 调用new方法，将函数结构体送入engine.Parse接口返回
 func deserializeParser(p SerializedParser) (engine.Parser, error) {
 	switch p.Name {
 	case config.ParseCityList:
@@ -81,6 +88,8 @@ func deserializeParser(p SerializedParser) (engine.Parser, error) {
 		return nil, errors.New("No method finding!")
 	}
 }
+
+// 反序列化ParseResult
 func DeserializeResult(r ParseResult) (engine.ParseResult, error) {
 	result := engine.ParseResult{
 		Items: r.Items,

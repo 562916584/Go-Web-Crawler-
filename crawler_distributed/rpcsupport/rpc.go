@@ -28,13 +28,15 @@ func ServeRpc(host string, service interface{}) error {
 	return nil
 }
 
-// 连接上 server
+// 用于连接上 server
 // 返回连接上服务的 client
 func NewClient(host string) (*rpc.Client, error) {
+	// 返回连接客户端
 	conn, err := net.Dial("tcp", host)
 	if err != nil {
 		return nil, err
 	}
+	// 返回jsonRpc客户端
 	client := jsonrpc.NewClient(conn)
 	return client, err
 }

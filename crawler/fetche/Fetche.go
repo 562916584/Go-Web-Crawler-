@@ -14,6 +14,7 @@ import (
 	"time"
 )
 
+// UA代理
 var userAgent = []string{
 	"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.163 Safari/535.1",
 	"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; InfoPath.3)",
@@ -26,8 +27,11 @@ var userAgent = []string{
 	"Mozilla/5.0(Windows;U;WindowsNT6.1;en-us)AppleWebKit/534.50(KHTML,likeGecko)Version/5.1Safari/534.50",
 	"Mozilla/4.0(compatible;MSIE7.0;WindowsNT5.1;TencentTraveler4.0)",
 }
+
+// 限制访问速度设置的访问延时
 var rateLimiter = time.Tick(10 * time.Millisecond)
 
+// 访问url 返回得到的html字节Slice
 func Fetche(url string) ([]byte, error) {
 	//resp, err := http.Get(url)
 	//if err != nil {
@@ -37,15 +41,15 @@ func Fetche(url string) ([]byte, error) {
 	// 通过限制访问速度 防止封锁
 	<-rateLimiter
 	log.Printf("Fetching url %s", url)
-	// 通过添加UA 伪装浏览器访问
+	// 得到一个http请求的客户端
 	client := &http.Client{}
+	// 返回一个get 请求
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// 随机产生UA
+	// 随机产生UA  初始化种子
 	rand.Seed(time.Now().Unix())
-
 	req.Header.Set("User-Agent", userAgent[rand.Intn(10)])
 
 	resp, err := client.Do(req)
@@ -73,12 +77,14 @@ func Fetche(url string) ([]byte, error) {
 	return ioutil.ReadAll(utf8Reader)
 }
 
+// 通过读入 1024字节的内容判断编码方式 并返回
 func determineEncoding(r *bufio.Reader) encoding.Encoding {
 	bytes, err := r.Peek(1024)
 	if err != nil {
 		log.Printf("Feche error :%s", err)
 		return unicode.UTF8
 	}
+	// 返回编码方式
 	e, _, _ := charset.DetermineEncoding(bytes, "")
 	return e
 }

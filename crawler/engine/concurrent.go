@@ -10,7 +10,7 @@ type ConcurrentEngine struct {
 	WorkerCount int
 	// 向elastic 存入数据的通道
 	ItemChan chan Item
-	// 定义worker函数
+	// 定义worker函数 两种 一种单机 一种分布式
 	RequestProcessor Processor
 }
 
@@ -64,6 +64,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 			}
 		}
 		for _, request := range result.Requests {
+			// 判断是不是重复的url
 			if isDuplicate(request.Url) {
 				continue
 			}
@@ -83,6 +84,7 @@ func (e *ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, r
 			request := <-in
 			//result, err := Worker(request)
 			// 替换为分布式worker --rpc
+			// worker 调用fetcher函数 和 Parse函数 返回result
 			result, err := e.RequestProcessor(request)
 			if err != nil {
 				continue

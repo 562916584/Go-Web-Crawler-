@@ -12,6 +12,9 @@ import (
 // 用法 go run main.go --port=9000 给port传值为9000
 var port = flag.Int("port", 0, "the port foe me to listen on")
 
+// 启动worker服务
+// 思路是客户端Call CrawlService.Process方法，参数是request，
+// 通过反序列化解析出request的Parse函数，然后调用具体函数解析
 func main() {
 	flag.Parse()
 	if *port == 0 {

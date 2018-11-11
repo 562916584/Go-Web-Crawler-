@@ -20,7 +20,7 @@ func main() {
 		ItemChan:         itemChan,
 		RequestProcessor: engine.Worker,
 	}
-	//并发爬虫入口
+	//并发爬虫入口 --- 配置第一个request的url和解析函数
 	e.Run(engine.Request{
 		Url:    "http://www.zhenai.com/zhenghun",
 		Parser: engine.NewFuncParser(parser.ParseCityList, config.ParseCityList),
