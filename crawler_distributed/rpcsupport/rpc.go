@@ -16,6 +16,7 @@ func ServeRpc(host string, service interface{}) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("Listening on %s", host)
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -28,6 +29,7 @@ func ServeRpc(host string, service interface{}) error {
 }
 
 // 连接上 server
+// 返回连接上服务的 client
 func NewClient(host string) (*rpc.Client, error) {
 	conn, err := net.Dial("tcp", host)
 	if err != nil {
