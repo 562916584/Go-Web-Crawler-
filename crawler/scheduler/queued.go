@@ -3,7 +3,7 @@ package scheduler
 import "WebSpider/crawler/engine"
 
 // worker 是抽象出来的工作函数 他的职能是获取
-//  并发爬虫
+//  并发爬虫调度器
 //  形成worker队列 等待request传入 然后调用worker函数抓取数据
 type QueuedScheduler struct {
 	// 输出request的通道
@@ -32,7 +32,7 @@ func (s *QueuedScheduler) WorkerChan() chan engine.Request {
 	return make(chan engine.Request)
 }
 
-// 并发式爬虫核心部分之一
+// 并发式爬虫核心部分之一 调度器调度
 // worker队列循环等待送入request 执行任务
 func (s *QueuedScheduler) Run() {
 	// requestChan 通过这个通道 从外界进入request

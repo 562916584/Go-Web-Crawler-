@@ -4,10 +4,11 @@ var visitedUrls = make(map[string]bool)
 
 // 爬虫引擎
 type ConcurrentEngine struct {
-	Scheduler   Scheduler
+	// 并发爬虫的调度器接口
+	Scheduler Scheduler
+	// 并发worker的数目
 	WorkerCount int
-	// 存入Item数据的管道  在main函数配置
-	// 当这个channel 有值输入那么便会进入到 SvaeItem中的gorutine里存入Item
+	// 向elastic 存入数据的通道
 	ItemChan chan Item
 	// 定义worker函数
 	RequestProcessor Processor
@@ -18,16 +19,22 @@ type Processor func(r Request) (ParseResult, error)
 
 type Scheduler interface {
 	ReadyNotifier
+	// 将request传入调度器中
 	Submit(Request)
+	// 返回一个输送request的通道
 	WorkerChan() chan Request
+	// 配置调度器的输送request通道
 	ConfigureMusterWorkerChan(chan Request)
+	// 调度器开始工作
 	Run()
 }
 
 type ReadyNotifier interface {
+	// worker的request输入通道，通过调度器workerChan，送入worker队列中
 	WorkerReady(chan Request)
 }
 
+// 并发爬虫引擎开始
 func (e *ConcurrentEngine) Run(seeds ...Request) {
 	// 准备工作
 	//in := make(chan Request)
@@ -36,7 +43,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	//e.Scheduler.ConfigureMusterWorkerChan(in)
 
 	e.Scheduler.Run()
-
+	// 产生worker
 	for i := 0; i < e.WorkerCount; i++ {
 		e.createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
@@ -65,14 +72,14 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	}
 }
 
-// 开启线程 将request通过channel读取 然后调用worker函数
+// 开启线程 将request通过channel读取 然后调用worker函数 从网上去抓取数据
 // 传入两个参数 in--输入request的通道 out--输出Parseresult的通道
-// 从网上去抓取数据
 func (e *ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 	go func() {
 		for {
 			// 告诉scheduler 我准备好了
 			ready.WorkerReady(in)
+			// 等待调度器调度，然后in输出request
 			request := <-in
 			//result, err := Worker(request)
 			// 替换为分布式worker --rpc

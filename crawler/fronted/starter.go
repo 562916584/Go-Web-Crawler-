@@ -13,7 +13,7 @@ func main() {
 		http.Dir("src/WebSpider/crawler/fronted/view")))
 	http.Handle("/search", controller.CreateSearchResultHandler(
 		"src/WebSpider/crawler/fronted/view/template.html"))
-	err := http.ListenAndServe(":8888", nil)
+	err := http.ListenAndServe("localhost:8888", nil)
 	if err != nil {
 		panic(err)
 	}

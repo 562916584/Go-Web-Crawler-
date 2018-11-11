@@ -3,8 +3,11 @@ package engine
 type ParserFunc func(
 	contents []byte, url string) ParseResult
 
+// 网页解析器接口
 type Parser interface {
+	// 解析函数 参数：contents为html读取字节slice url为当前访问的url  返回值：解析结果结构体
 	Parse(contents []byte, url string) ParseResult
+	// 序列化函数 返回值： 函数名字  函数参数 --用于分布式rpc传输
 	Serialize() (name string, args interface{})
 }
 type Request struct {

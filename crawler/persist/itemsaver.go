@@ -8,7 +8,9 @@ import (
 	"log"
 )
 
+// 返回一个 向elasticSearch 存数据的 channel通道
 func ItemSaver(index string) (chan engine.Item, error) {
+	// 创建一个连接elastic的客户端 --- 客户端使用默认的接口 192.168.99.100:9200
 	client, err := elastic.NewClient(
 		// 运行在docker上 是内网访问
 		elastic.SetSniff(false))
@@ -16,6 +18,8 @@ func ItemSaver(index string) (chan engine.Item, error) {
 		return nil, err
 	}
 	out := make(chan engine.Item)
+	// 常用做法，将out输出的处理方法 go func出去
+	// 然后返回out通道给外界,以此运行方法
 	go func() {
 		itemCount := 1
 		for {
@@ -50,6 +54,7 @@ func Save(item engine.Item, client *elastic.Client, index string) (err error) {
 	if item.Id != "" {
 		indexService.Id(item.Id)
 	}
+	// 向elastic存Item
 	_, err1 := indexService.Do(context.Background())
 	if err1 != nil {
 		return err1
