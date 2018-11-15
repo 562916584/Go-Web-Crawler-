@@ -6,6 +6,7 @@ import (
 	"io"
 )
 
+// 返回搜索view
 type SearchResultView struct {
 	// 返回生成的模板html
 	template *template.Template
