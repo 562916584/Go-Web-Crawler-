@@ -79,6 +79,7 @@ func (e *ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, r
 	go func() {
 		for {
 			// 告诉scheduler 我准备好了
+			// 将in这个chan request放入调度器中
 			ready.WorkerReady(in)
 			// 等待调度器调度，然后in输出request
 			request := <-in
