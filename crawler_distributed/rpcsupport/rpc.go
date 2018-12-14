@@ -8,7 +8,7 @@ import (
 )
 
 // 起服务器
-//  传入方法 发布再服务上
+//  传入方法 发布在服务上
 func ServeRpc(host string, service interface{}) error {
 	// 将方法发布到默认服务器上
 	rpc.Register(service)
