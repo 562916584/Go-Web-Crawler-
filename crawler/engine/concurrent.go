@@ -42,6 +42,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	// 将in 这个channel与workerChannel关联
 	//e.Scheduler.ConfigureMusterWorkerChan(in)
 
+	// 初始化调度器中 request通道和 request chan通道
 	e.Scheduler.Run()
 	// 产生worker
 	for i := 0; i < e.WorkerCount; i++ {
@@ -80,6 +81,8 @@ func (e *ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, r
 		for {
 			// 告诉scheduler 我准备好了
 			// 将in这个chan request放入调度器中
+			// 注意：in放入调度器后，加入到调度器的request chan的队列中，当被选中向其中分配了request后
+			// 	被剔除队列，等待worker执行完动作后，再次通过request chan通道将in加入到request chan队列
 			ready.WorkerReady(in)
 			// 等待调度器调度，然后in输出request
 			request := <-in
@@ -90,6 +93,7 @@ func (e *ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, r
 			if err != nil {
 				continue
 			}
+			// 将网页爬去的数据 由out通道传给Run函数中
 			out <- result
 		}
 	}()
